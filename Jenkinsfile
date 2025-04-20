@@ -25,6 +25,11 @@ pipeline {
             }
         }
         stage('Run Tests') {
+            environment {
+                SECRET_MESSAGE="This is a secret message!"
+                USERNAME="admin"
+                PASSWORD="password123"
+            }
             steps {
                 script {
                     sh 'npm test'
