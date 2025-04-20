@@ -64,7 +64,7 @@ pipeline {
                     // Deploy Docker image to production
                     sshagent(['aws-private-key']) {
                         sh """
-                            ssh -o StrictHostKeyChecking=no ec2-user@$instance_ip << 'EOF'
+                            ssh -o StrictHostKeyChecking=no ec2-user@ec2-52-201-211-111.compute-1.amazonaws.com << 'EOF'
                                 if docker ps | grep -q node-app;then
                                     docker stop node-app && docker rm node-app
                                 fi
