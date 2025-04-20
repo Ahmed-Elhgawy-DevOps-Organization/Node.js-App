@@ -56,7 +56,7 @@ pipeline {
         stage('Deploy to Production') {
             steps {
                 script {
-                    withAWS(credentials:'Iaws-jenkins-creds', region:'us-east-1') {
+                    withAWS(credentials:'aws-jenkins-creds', region:'us-east-1') {
                         def instance_ip = sh(
                             script: '''
                                 aws ec2 describe-instances \
