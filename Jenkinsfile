@@ -66,11 +66,14 @@ pipeline {
                             ''',
                             returnStdout: true
                         ).trim()
+                        sh '''
+                            instance_ip=$(aws ec2 describe-instances --query "Reservations[*].Instances[*].PublicDnsName" --output text)
+                        '''
                     }
                     // Deploy Docker image to production
                     sshagent(['aws-private-key']) {
                             sh """
-                                ssh -o StrictHostKeyChecking=no ec2-user@${instance_ip} << 'EOF'
+                                ssh -o StrictHostKeyChecking=no ec2-user@$instance_ip << 'EOF'
                                     if docker ps | grep -q node-app;then
                                         docker stop node-app && docker rm node-app
                                     fi
