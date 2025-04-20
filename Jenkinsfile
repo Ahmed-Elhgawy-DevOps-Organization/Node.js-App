@@ -57,20 +57,17 @@ pipeline {
             steps {
                 script {
                     withAWS(credentials:'aws-jenkins-creds', region:'us-east-1') {
-                        sh '''
-                            instance_ip=$(aws ec2 describe-instances --query "Reservations[*].Instances[*].PublicDnsName" --output text)
-                        '''
-                    }
-                    // Deploy Docker image to production
-                    sshagent(['aws-private-key']) {
-                        sh '''
-                            ssh -o StrictHostKeyChecking=no ec2-user@$instance_ip << EOF
-                                if docker ps | grep -q node-app;then
-                                    docker stop node-app && docker rm node-app
-                                fi
-                                docker run -d -p 3000:3000 --name node-app -e USERNAME=admin -e PASSWORD=pass123 ${IMAGE_NAME}
-                            EOF
-                        '''
+                        sshagent(['aws-private-key']) {
+                            sh '''
+                                instance_ip=$(aws ec2 describe-instances --query "Reservations[*].Instances[*].PublicDnsName" --output text)
+                                ssh -o StrictHostKeyChecking=no ec2-user@$instance_ip << EOF
+                                    if docker ps | grep -q node-app;then
+                                        docker stop node-app && docker rm node-app
+                                    fi
+                                    docker run -d -p 3000:3000 --name node-app -e USERNAME=admin -e PASSWORD=pass123 ${IMAGE_NAME}
+                                EOF
+                            '''
+                        }
                     }
                 }
             }
