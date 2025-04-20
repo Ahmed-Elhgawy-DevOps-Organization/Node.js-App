@@ -60,7 +60,7 @@ pipeline {
                         sshagent(['aws-private-key']) {
                             sh '''
                                 instance_ip=$(aws ec2 describe-instances --query "Reservations[*].Instances[*].PublicDnsName" --output text)
-                                ssh -o StrictHostKeyChecking=no ec2-user@$instance_ip << EOF
+                                ssh -o StrictHostKeyChecking=no ec2-user@$instance_ip <<EOF
                                     if docker ps | grep -q node-app;then
                                         docker stop node-app && docker rm node-app
                                     fi
