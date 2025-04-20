@@ -4,7 +4,7 @@ COPY . /app/
 WORKDIR /app
 RUN npm install
 
-ARG SECRET_MESSAGE="This is a secret message!"
+ENV SECRET_MESSAGE="This is a secret message!"
 ARG USERNAME
 ARG PASSWORD
 
