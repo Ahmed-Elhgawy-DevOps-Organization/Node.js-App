@@ -7,6 +7,8 @@ pipeline {
 
     environment {
         IMAGE_NAME="elhgawy/node-app:${env.BUILD_ID}"
+        DOCKER_HUB_CREDS = credentials('dockerhub')
+        APP_CREDS = credentials('app-creds')
     }
 
     stages{
@@ -27,8 +29,8 @@ pipeline {
         stage('Run Tests') {
             environment {
                 SECRET_MESSAGE="This is a secret message!"
-                USERNAME="admin"
-                PASSWORD="password123"
+                USERNAME="${APP_CREDS_USR}"
+                PASSWORD="${APP_CREDS_PSW}"
             }
             steps {
                 script {
@@ -56,6 +58,8 @@ pipeline {
         stage('Deploy to Production') {
             steps {
                 script {
+                    // login to Dockerhub
+                    sh 'docker login -u ${DOCKER_HUB_CREDS_USR} -p ${DOCKER_HUB_CREDS_PSW}'
                     withAWS(credentials:'aws-jenkins-creds', region:'us-east-1') {
                         sshagent(['aws-private-key']) {
                             sh '''
@@ -64,7 +68,7 @@ pipeline {
                                     if docker ps | grep -q node-app;then
                                         docker stop node-app && docker rm node-app
                                     fi
-                                    docker run -d -p 3000:3000 --name node-app -e USERNAME=admin -e PASSWORD=pass123 ${IMAGE_NAME}
+                                    docker run -d -p 3000:3000 --name node-app -e USERNAME=${APP_CREDS_USR} -e PASSWORD=${APP_CREDS_PSW} ${IMAGE_NAME}
                                 "
                             '''
                         }
